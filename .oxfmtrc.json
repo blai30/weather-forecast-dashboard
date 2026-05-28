@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortTailwindcss": {
+    "functions": ["tw", "clsx", "cva"]
+  },
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "ignorePatterns": ["**/dist/**", "**/node_modules/**", "**/out/**", "**/public/**"],
+  "jsxSingleQuote": false,
+  "semi": false,
+  "singleQuote": true,
+  "sortImports": true,
+  "sortPackageJson": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false
+}
