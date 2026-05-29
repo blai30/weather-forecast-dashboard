@@ -72,8 +72,8 @@ function getCapabilities(): string {
 function getDeviceInformation(deviceName: string): string {
   return `
     <td:GetDeviceInformationResponse xmlns:td="${DEVICE_NS}">
-      <td:Manufacturer>Weather Dashboard</td:Manufacturer>
-      <td:Model>Virtual Camera</td:Model>
+      <td:Manufacturer>Generic</td:Manufacturer>
+      <td:Model>ONVIF Camera</td:Model>
       <td:SerialNumber>${deviceUuid}</td:SerialNumber>
       <td:FirmwareVersion>1.0.0</td:FirmwareVersion>
       <td:HardwareId>1.0</td:HardwareId>
@@ -336,7 +336,11 @@ export function startOnvifServer(config: OnvifServerConfig) {
         response = `<td:GetRTSPRedirectResponse xmlns:td="${DEVICE_NS}"><td:RTSPRedirect>false</td:RTSPRedirect></td:GetRTSPRedirectResponse>`
       } else {
         console.log('Unknown ONVIF request:', soapBody.slice(0, 200))
-        response = `<Fault xmlns="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soap:Client</faultcode><faultstring>Unknown action</faultstring></Fault>`
+        response = `<Fault xmlns="http://schemas.xml:soap/envelope/"><faultcode>soap:Client</faultcode><faultstring>Unknown action</faultstring></Fault>`
+      }
+
+      if (!response.includes('<Fault')) {
+        console.log('ONVIF request handled successfully')
       }
 
       const envelope = `<?xml version="1.0" encoding="utf-8"?>

@@ -3,10 +3,10 @@ import { IncomingMessage, ServerResponse, createServer } from 'node:http'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { startCapturePipeline } from '@/server/capture'
-import { startOnvifServer } from '@/server/onvif'
-import { startRtspServer } from '@/server/rtsp'
-import { startWsDiscovery } from '@/server/wsdiscovery'
+import { startCapturePipeline } from './capture'
+import { startOnvifServer } from './onvif'
+import { startRtspServer } from './rtsp'
+import { startWsDiscovery } from './wsdiscovery'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 

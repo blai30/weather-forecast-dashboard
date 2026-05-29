@@ -37,7 +37,7 @@ function buildProbeMatches(probeId: string, probeTo: string): string {
           <wsa:Address>urn:uuid:${deviceUuid}</wsa:Address>
         </wsa:EndpointReference>
         <wsd:Types>NetworkVideoTransmitter OnvifDevice DeviceIO MediaIO VideoAnalytics</wsd:Types>
-        <wsd:Scopes>onvif://www.onvif.org/type/VideoEncoder onvif://www.onvif.org/type/VideoSource onvif://www.onvif.org/name/WeatherDashboard</wsd:Scopes>
+        <wsd:Scopes>onvif://www.onvif.org/type/VideoEncoder onvif://www.onvif.org/type/HDStreamer</wsd:Scopes>
         <wsd:XAddrs>${deviceEndpoint}</wsd:XAddrs>
         <wsd:MetadataVersion>0</wsd:MetadataVersion>
       </wsd:ProbeMatch>
@@ -64,7 +64,7 @@ function buildHello(): string {
         <wsa:Address>urn:uuid:${deviceUuid}</wsa:Address>
       </wsa:EndpointReference>
       <wsd:Types>NetworkVideoTransmitter OnvifDevice DeviceIO MediaIO VideoAnalytics</wsd:Types>
-      <wsd:Scopes>onvif://www.onvif.org/type/VideoEncoder onvif://www.onvif.org/type/VideoSource onvif://www.onvif.org/name/WeatherDashboard</wsd:Scopes>
+      <wsd:Scopes>onvif://www.onvif.org/type/VideoEncoder onvif://www.onvif.org/type/HDStreamer</wsd:Scopes>
       <wsd:XAddrs>${deviceEndpoint}</wsd:XAddrs>
       <wsd:MetadataVersion>0</wsd:MetadataVersion>
     </wsd:Hello>

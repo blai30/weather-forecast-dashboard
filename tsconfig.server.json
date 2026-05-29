@@ -12,10 +12,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src/server"]
 }
