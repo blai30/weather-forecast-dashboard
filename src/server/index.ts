@@ -14,7 +14,12 @@ const PORT = Number(process.env.SERVER_PORT ?? 3000)
 const RTSP_PORT = Number(process.env.RTSP_PORT ?? 554)
 const WS_DISCOVERY_PORT = Number(process.env.WS_DISCOVERY_PORT ?? 3702)
 const FRAME_RATE = Number(process.env.FRAME_RATE ?? 5)
-const ONVIF_HOST = process.env.ONVIF_HOST ?? '0.0.0.0'
+// Bind address (where the server listens) vs advertised address (what we tell ONVIF clients)
+const ONVIF_BIND_HOST = process.env.ONVIF_BIND_HOST ?? '0.0.0.0'
+const rawHost = process.env.ONVIF_ADVERTISED_HOST ?? process.env.ONVIF_HOST
+const ONVIF_ADVERTISED_HOST = rawHost && rawHost !== '0.0.0.0' ? rawHost : '127.0.0.1'
+// Ensure other modules that read process.env.ONVIF_HOST see the advertised host
+process.env.ONVIF_HOST = ONVIF_ADVERTISED_HOST
 const ONVIF_DEVICE_NAME = process.env.ONVIF_DEVICE_NAME ?? 'Weather Dashboard Camera'
 
 // Serve the built SPA
@@ -53,14 +58,16 @@ function serveSpa(req: IncomingMessage, res: ServerResponse) {
 async function main() {
   // Start ONVIF SOAP server
   const onvifServer = startOnvifServer({
-    host: ONVIF_HOST,
+    host: ONVIF_ADVERTISED_HOST,
     rtspPort: RTSP_PORT,
     deviceName: ONVIF_DEVICE_NAME,
+    username: process.env.ONVIF_USER,
+    password: process.env.ONVIF_PASS,
   })
 
   // Start WS-Discovery responder
   startWsDiscovery({
-    host: ONVIF_HOST,
+    host: ONVIF_ADVERTISED_HOST,
     wsDiscoveryPort: WS_DISCOVERY_PORT,
   })
 
@@ -73,9 +80,9 @@ async function main() {
     httpServer.listen(PORT, () => {
       console.log(`Weather Dashboard server running:`)
       console.log(`SPA: http://localhost:${PORT}`)
-      console.log(`ONVIF: http://${ONVIF_HOST}:8000/onvif`)
-      console.log(`RTSP: rtsp://${ONVIF_HOST}:${RTSP_PORT}/stream`)
-      console.log(`WS-Discovery: udp://${ONVIF_HOST}:${WS_DISCOVERY_PORT}`)
+      console.log(`ONVIF: http://${ONVIF_ADVERTISED_HOST}:8000/onvif`)
+      console.log(`RTSP: rtsp://${ONVIF_ADVERTISED_HOST}:${RTSP_PORT}/stream`)
+      console.log(`WS-Discovery: udp://${ONVIF_ADVERTISED_HOST}:${WS_DISCOVERY_PORT}`)
       resolve()
     })
   })

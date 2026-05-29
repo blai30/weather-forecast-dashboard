@@ -16,7 +16,9 @@ function buildProbeMatches(probeId: string, probeTo: string): string {
   return `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-               xmlns:wsd="http://schemas.xmlsoap.org/ws/2005/04/discovery">
+               xmlns:wsd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+               xmlns:dn="http://www.onvif.org/ver10/network/wsdl"
+               xmlns:tmd="http://www.onvif.org/ver10/device/wsdl">
   <soap:Header>
     <wsa:MessageID>urn:uuid:${randomUUID()}</wsa:MessageID>
     <wsa:RelatesTo>${probeId}</wsa:RelatesTo>
@@ -34,7 +36,7 @@ function buildProbeMatches(probeId: string, probeTo: string): string {
         <wsa:EndpointReference>
           <wsa:Address>urn:uuid:${deviceUuid}</wsa:Address>
         </wsa:EndpointReference>
-        <wsd:Types>dn:NetworkVideoTransmitter tmd:OnvifDevice tmd:DeviceIO tmd:MediaIO tmd:VideoAnalytics</wsd:Types>
+        <wsd:Types>NetworkVideoTransmitter OnvifDevice DeviceIO MediaIO VideoAnalytics</wsd:Types>
         <wsd:Scopes>onvif://www.onvif.org/type/VideoEncoder onvif://www.onvif.org/type/VideoSource onvif://www.onvif.org/name/WeatherDashboard</wsd:Scopes>
         <wsd:XAddrs>${deviceEndpoint}</wsd:XAddrs>
         <wsd:MetadataVersion>0</wsd:MetadataVersion>
@@ -48,18 +50,20 @@ function buildHello(): string {
   return `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-               xmlns:wsd="http://schemas.xmlsoap.org/ws/2005/04/discovery">
+               xmlns:wsd="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+               xmlns:dn="http://www.onvif.org/ver10/network/wsdl"
+               xmlns:tmd="http://www.onvif.org/ver10/device/wsdl">
   <soap:Header>
     <wsa:MessageID>urn:uuid:${randomUUID()}</wsa:MessageID>
     <wsa:To>urn:schemas-xmlsoap-org:ws:2005:04:discovery</wsa:To>
     <wsa:Action>http://schemas.xmlsoap.org/ws/2005/04/discovery/Hello</wsa:Action>
   </soap:Header>
   <soap:Body>
-    <wsd:Hello>
+      <wsd:Hello>
       <wsa:EndpointReference>
         <wsa:Address>urn:uuid:${deviceUuid}</wsa:Address>
       </wsa:EndpointReference>
-      <wsd:Types>dn:NetworkVideoTransmitter tmd:OnvifDevice tmd:DeviceIO tmd:MediaIO tmd:VideoAnalytics</wsd:Types>
+      <wsd:Types>NetworkVideoTransmitter OnvifDevice DeviceIO MediaIO VideoAnalytics</wsd:Types>
       <wsd:Scopes>onvif://www.onvif.org/type/VideoEncoder onvif://www.onvif.org/type/VideoSource onvif://www.onvif.org/name/WeatherDashboard</wsd:Scopes>
       <wsd:XAddrs>${deviceEndpoint}</wsd:XAddrs>
       <wsd:MetadataVersion>0</wsd:MetadataVersion>

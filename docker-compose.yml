@@ -3,15 +3,15 @@ services:
     build:
       context: .
       args:
-        - VITE_WEATHER_LAT=${VITE_WEATHER_LAT:-37.6688}
-        - VITE_WEATHER_LON=${VITE_WEATHER_LON:--122.0810}
-        - VITE_WEATHER_NAME=${VITE_WEATHER_NAME:-Hayward, CA}
-        - VITE_WEATHER_TIMEZONE=${VITE_WEATHER_TIMEZONE:-America/Los_Angeles}
+        - VITE_WEATHER_LAT=${VITE_WEATHER_LAT}
+        - VITE_WEATHER_LON=${VITE_WEATHER_LON}
+        - VITE_WEATHER_NAME=${VITE_WEATHER_NAME}
+        - VITE_WEATHER_TIMEZONE=${VITE_WEATHER_TIMEZONE}
     container_name: weather-dash
     ports:
-      - '3000:3000'    # SPA + HTTP
-      - '8000:8000'    # ONVIF SOAP
-      - '554:554'      # RTSP
+      - '3000:3000' # SPA + HTTP
+      - '8000:8000' # ONVIF SOAP
+      - '554:554' # RTSP
       - '3702:3702/udp' # WS-Discovery
     restart: unless-stopped
     environment:
@@ -20,6 +20,12 @@ services:
       - WS_DISCOVERY_PORT=3702
       - FRAME_RATE=${FRAME_RATE:-5}
       - ONVIF_HOST=${ONVIF_HOST:-0.0.0.0}
+      # For Docker Desktop on Windows/Mac, host.docker.internal maps to the host machine.
+      # Set ONVIF_ADVERTISED_HOST to the IP/hostname reachable by your UniFi controller.
+      - ONVIF_ADVERTISED_HOST=${ONVIF_ADVERTISED_HOST:-host.docker.internal}
+      # ONVIF credentials (UniFi requires credentials)
+      - ONVIF_USER=${ONVIF_USER:-admin}
+      - ONVIF_PASS=${ONVIF_PASS:-admin}
       - ONVIF_DEVICE_NAME=${ONVIF_DEVICE_NAME:-Weather Dashboard Camera}
     # Give extra memory for Playwright + FFmpeg
     deploy:

@@ -10,6 +10,8 @@ interface OnvifServerConfig {
   host: string
   rtspPort: number
   deviceName: string
+  username?: string
+  password?: string
 }
 
 const deviceUuid = randomUUID()
@@ -23,7 +25,7 @@ function getCapabilities(): string {
         <tt:AnalyticsEngine>false</tt:AnalyticsEngine>
       </tt:Analytics>
       <tt:Device>
-        <tt:XAddr>http://${process.env.ONVIF_HOST ?? 'localhost'}:8000/onvif/device_service</tt:XAddr>
+        <tt:XAddr>http://${getHost()}:8000/onvif/device_service</tt:XAddr>
         <tt:Network>true</tt:Network>
         <tt:DiscoveryByLocation>false</tt:DiscoveryByLocation>
         <tt:DiscoveryByDevicePort>false</tt:DiscoveryByDevicePort>
@@ -45,16 +47,16 @@ function getCapabilities(): string {
         </tt:Extension>
       </tt:Device>
       <tt:Events>
-        <tt:WssUrl>http://${process.env.ONVIF_HOST ?? 'localhost'}:8000/onvif/event_service</tt:WssUrl>
+        <tt:WssUrl>http://${getHost()}:8000/onvif/event_service</tt:WssUrl>
         <tt:SubscriptionPolicy>false</tt:SubscriptionPolicy>
         <tt:Extension />
       </tt:Events>
       <tt:Imaging>
-        <tt:XAddr>http://${process.env.ONVIF_HOST ?? 'localhost'}:8000/onvif/Imaging_service</tt:XAddr>
+        <tt:XAddr>http://${getHost()}:8000/onvif/Imaging_service</tt:XAddr>
       </tt:Imaging>
       <tt:Media>
-        <tt:XAddr>http://${process.env.ONVIF_HOST ?? 'localhost'}:8000/onvif/media_service</tt:XAddr>
-        <tt:Profile>false</tt:Profile>
+        <tt:XAddr>http://${getHost()}:8000/onvif/media_service</tt:XAddr>
+        <tt:Profile>true</tt:Profile>
         <tt:StreamingCapabilities>
           <tt:RTPMulticast>false</tt:RTPMulticast>
           <tt:RTP_TCP>true</tt:RTP_TCP>
@@ -117,7 +119,7 @@ function getProfiles(): string {
 }
 
 function getStreamUri(rtspPort: number): string {
-  const host = process.env.ONVIF_HOST ?? 'localhost'
+  const host = getHost()
   return `
     <tr:GetStreamUriResponse xmlns:tr="${MEDIA_NS}">
       <tr:MediaUri>
@@ -187,7 +189,7 @@ function getServices(): string {
       <td:Services>
         <td:Service>
           <td:Namespace>${DEVICE_NS}</td:Namespace>
-          <td:XAddr>http://localhost:8000/onvif/device_service</td:XAddr>
+          <td:XAddr>http://${getHost()}:8000/onvif/device_service</td:XAddr>
           <td:Version>
             <td:Major>02</td:Major>
             <td:Minor>41</td:Minor>
@@ -195,7 +197,7 @@ function getServices(): string {
         </td:Service>
         <td:Service>
           <td:Namespace>${MEDIA_NS}</td:Namespace>
-          <td:XAddr>http://localhost:8000/onvif/media_service</td:XAddr>
+          <td:XAddr>http://${getHost()}:8000/onvif/media_service</td:XAddr>
           <td:Version>
             <td:Major>02</td:Major>
             <td:Minor>41</td:Minor>
@@ -203,7 +205,7 @@ function getServices(): string {
         </td:Service>
         <td:Service>
           <td:Namespace>${IMAGING_NS}</td:Namespace>
-          <td:XAddr>http://localhost:8000/onvif/Imaging_service</td:XAddr>
+          <td:XAddr>http://${getHost()}:8000/onvif/Imaging_service</td:XAddr>
           <td:Version>
             <td:Major>02</td:Major>
             <td:Minor>41</td:Minor>
@@ -222,8 +224,29 @@ function getHost(): string {
 
 export function startOnvifServer(config: OnvifServerConfig) {
   const { rtspPort, deviceName } = config
+  const requireAuth = !!(config.username && config.password)
+  const authUser = config.username ?? ''
+  const authPass = config.password ?? ''
 
   const server = createServer((req, res) => {
+    // Basic HTTP auth for ONVIF SOAP endpoint if configured
+    const authHeader = (req.headers['authorization'] as string) || ''
+    if (requireAuth) {
+      const parts = authHeader.split(' ')
+      if (parts.length !== 2 || parts[0] !== 'Basic') {
+        res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="ONVIF Device"' })
+        res.end()
+        return
+      }
+      const decoded = Buffer.from(parts[1], 'base64').toString('utf-8')
+      const [user, pass] = decoded.split(':')
+      if (user !== authUser || pass !== authPass) {
+        res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="ONVIF Device"' })
+        res.end()
+        return
+      }
+    }
+
     const body: string[] = []
 
     req.on('data', (chunk: Buffer) => {

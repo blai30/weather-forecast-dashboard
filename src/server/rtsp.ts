@@ -31,15 +31,16 @@ function buildSdp(rtspPort: number): string {
   const host = process.env.ONVIF_HOST ?? '127.0.0.1'
   const sdp = [
     'v=0',
-    'o=- 0 0 IN IP4 127.0.0.1',
+    `o=- 0 0 IN IP4 ${host}`,
     's=Weather Dashboard Stream',
-    'c=IN IP4 127.0.0.1',
+    `c=IN IP4 ${host}`,
     't=0 0',
     'a=control:*',
-    'm=video 0 RTP/AVP 96',
+    `m=video ${rtspPort} RTP/AVP 96`,
     'a=rtpmap:96 H264/90000',
     'a=fmtp:96 profile-level-id=42c028;packetization-mode=1;sprop-parameter-sets=' +
       `${Buffer.from(SPS.subarray(1)).toString('base64').replace(/=/g, '')},${Buffer.from(PPS.subarray(1)).toString('base64').replace(/=/g, '')}`,
+    `a=control:rtsp://${host}:${rtspPort}/stream`,
     'a=control:trackID=1',
   ]
   return sdp.join('\r\n') + '\r\n'
