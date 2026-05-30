@@ -1,6 +1,5 @@
 {
   "name": "weather-dash",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -24,7 +23,6 @@
     "d3-scale": "^4.0.2",
     "d3-shape": "^3.2.0",
     "lucide-preact": "^1.17.0",
-    "playwright": "^1.60.0",
     "preact": "^10.29.2",
     "tailwindcss": "^4.3.0"
   },
@@ -35,7 +33,6 @@
     "@types/node": "^25.9.1",
     "oxfmt": "^0.52.0",
     "oxlint": "^1.67.0",
-    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
     "vite": "^8.0.14"
   }
