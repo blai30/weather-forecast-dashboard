@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY package.json tsconfig.server.json index.ts ./
-RUN npm install
+COPY package.json pnpm-lock.yaml tsconfig.server.json index.ts ./
+RUN npm install -g pnpm && pnpm install
 
 # Initialize virtual canvas and execute using tsx
 CMD ["sh", "-c", "Xvfb :99 -screen 0 1920x1080x24 & DISPLAY=:99 npx tsx index.ts"]
