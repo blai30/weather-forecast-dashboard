@@ -1,0 +1,46 @@
+services:
+  # 1. Your Local Weather App
+  vite-app:
+    image: node:24-bookworm
+    container_name: vite-app
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - '5173:5173'
+    command: sh -c "npm install && npm run dev -- --host"
+    restart: unless-stopped
+
+  # 2. RTSP Server Broker
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx
+    restart: unless-stopped
+    depends_on:
+      - vite-app
+
+  # 3. Canvas Capture and Encoder
+  server:
+    build: .
+    container_name: dashboard-server
+    restart: unless-stopped
+    depends_on:
+      - vite-app
+      - mediamtx
+
+  # 4. ONVIF Protocol Emulation Layer
+  onvif:
+    # Original: https://github.com/p10tyr/rtsp-to-onvif
+    # image: kulasolutions/rtsp-to-onvif:latest
+    # Build a docker image from build-docker.sh for arm64
+    image: rtsp-to-onvif:arm64
+    hostname: onvif
+    container_name: onvif
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./onvif.yaml:/onvif.yaml
+    depends_on:
+      - mediamtx
