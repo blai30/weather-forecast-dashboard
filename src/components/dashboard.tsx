@@ -24,16 +24,12 @@ export function Dashboard() {
   if (!data) return null
 
   return (
-    <div class="flex h-screen items-start">
-      <div class="aspect-video w-full p-6">
-        <main class="grid size-full grid-cols-3 grid-rows-2 gap-6">
-          {/* Current conditions and temperature */}
-          <CurrentWeather current={data.current} class="col-span-2" />
-          <CurrentTemperature current={data.current} class="col-span-1" />
-          {/* 12 hour forecast conditions chart */}
-          <div class="col-span-3 border">12-hour forecast</div>
-        </main>
-      </div>
+    <div class="grid size-full grid-cols-3 grid-rows-2 gap-6 bg-linear-to-br from-sky-400 via-purple-500 to-pink-500 p-6">
+      {/* Current conditions and temperature */}
+      <CurrentWeather current={data.current} class="col-span-2" />
+      <CurrentTemperature current={data.current} class="col-span-1" />
+      {/* 12 hour forecast conditions chart */}
+      <div class="col-span-3 border">12-hour forecast</div>
     </div>
   )
 }
