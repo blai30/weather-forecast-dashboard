@@ -2,34 +2,6 @@
 
 A live weather dashboard
 
-## Quick Start
-
-### Configure Your Location
-
-Copy the example env file and edit it:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your coordinates:
-
-```env
-VITE_WEATHER_LAT=40.7128
-VITE_WEATHER_LON=-74.006
-VITE_WEATHER_NAME=New York
-```
-
-## Configuration
-
-| Environment Variable | Default    | Description                          |
-| -------------------- | ---------- | ------------------------------------ |
-| `VITE_WEATHER_LAT`   | `40.7128`  | Latitude for weather data            |
-| `VITE_WEATHER_LON`   | `-74.006`  | Longitude for weather data           |
-| `VITE_WEATHER_NAME`  | `New York` | Display name for location            |
-| `FRAME_RATE`         | `5`        | Frames per second (lower = less CPU) |
-| `REFRESH_INTERVAL`   | `600000`   | Dashboard reload interval (ms)       |
-
 ## Development
 
 ### Prerequisites
