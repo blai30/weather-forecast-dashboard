@@ -9,19 +9,19 @@ onvif:
       rtsp: /weather
       width: 1280
       height: 720
-      framerate: 10
+      framerate: 1
       bitrate: 1024
       quality: 4
     # lowQuality:
     #   rtsp: /weather
     #   width: 1280
     #   height: 720
-    #   framerate: 10
+    #   framerate: 1
     #   bitrate: 512
     #   quality: 1
     target:
       hostname: localhost
       ports:
-        rtsp: 8554
+        rtsp: 554
     uuid: a88b38fc-600a-4d5d-bcad-118f7ae79098
     mac: 5E:11:BC:67:DB:F3

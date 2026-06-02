@@ -3,8 +3,8 @@ import { spawn } from 'child_process'
 import puppeteer from 'puppeteer'
 
 const APP_URL = 'http://vite-app:5173'
-const RTSP_URL = 'rtsp://mediamtx:8554/weather'
-const FRAMERATE = 10
+const RTSP_URL = 'rtsp://mediamtx:554/weather'
+const FRAMERATE = 1
 const INTERVAL = 60_000
 
 async function main() {

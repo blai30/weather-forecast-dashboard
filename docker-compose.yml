@@ -15,12 +15,15 @@ services:
     image: bluenviron/mediamtx:latest
     ports:
       # RTSP (for onvif container to reach via host)
-      - '8554:8554'
+      - '554:554'
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml
     restart: unless-stopped
 
   # 3. Canvas Capture and Encoder
   server:
     build: .
+    image: weather-dash-server
     restart: unless-stopped
     depends_on:
       - vite-app
