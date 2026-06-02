@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     depends_on:
       - vite-app
+      - mediamtx
 
   # 4. ONVIF Protocol Emulation Layer
   onvif:

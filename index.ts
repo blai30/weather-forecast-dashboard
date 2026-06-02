@@ -4,7 +4,8 @@ import puppeteer from 'puppeteer'
 
 const APP_URL = 'http://vite-app:5173'
 const RTSP_URL = 'rtsp://mediamtx:8554/weather'
-const FRAMERATE = 1
+const FRAMERATE = 15
+const INTERVAL = 60_000
 
 async function main() {
   const browser = await puppeteer.launch({
@@ -34,13 +35,16 @@ async function main() {
   // oxfmt-ignore
   const ffmpeg = spawn('ffmpeg', [
     '-f', 'image2pipe',
-    '-vcodec', 'png',
-    '-r', FRAMERATE.toString(),
-    '-i', '-',
+    '-c:v', 'png',
+    '-framerate', '1',
+    '-i', 'pipe:0',
     '-c:v', 'libx264',
     '-pix_fmt', 'yuv420p',
+    '-color_range', '1',
     '-preset', 'ultrafast',
     '-tune', 'stillimage',
+    '-r', FRAMERATE.toString(),
+    '-g', (FRAMERATE * 2).toString(),
     '-f', 'rtsp',
     '-rtsp_transport', 'tcp',
     RTSP_URL
@@ -50,25 +54,24 @@ async function main() {
     console.log(`[FFMPEG] ${data.toString()}`)
   })
 
-  while (true) {
-    try {
-      const startTime = Date.now()
-
-      // Capture screenshot as a raw buffer and write to FFMPEG stdin
-      const screenshotBuffer = await page.screenshot({ type: 'png' })
-      ffmpeg.stdin.write(screenshotBuffer)
-
-      // Dynamically calculate sleep time to maintain target framerate
-      const elapsed = Date.now() - startTime
-      const sleepTime = Math.max(0, 1000 / FRAMERATE - elapsed)
-      await new Promise((resolve) => setTimeout(resolve, sleepTime))
-    } catch (err) {
-      console.error('Error during frame capture:', err)
-      break
-    }
+  let latestFrame: Buffer | Uint8Array<ArrayBufferLike> | null = null
+  const writeFrame = async () => {
+    const screenshot = await page.screenshot({ type: 'png' })
+    latestFrame = screenshot
+    console.log(`Captured new frame at ${new Date().toISOString()}`)
   }
 
-  await browser.close()
+  // Capture new screenshot every 60 seconds
+  await writeFrame()
+  setInterval(writeFrame, INTERVAL)
+
+  // Push to ffmpeg stdin at 1 fps to keep stream alive
+  setInterval(() => {
+    if (latestFrame && !ffmpeg.stdin.destroyed) {
+      const success = ffmpeg.stdin.write(latestFrame)
+      if (!success) ffmpeg.stdin.once('drain', () => {})
+    }
+  }, 1000)
 }
 
 main().catch(console.error)
