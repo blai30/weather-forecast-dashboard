@@ -4,7 +4,8 @@ import puppeteer from 'puppeteer'
 
 const APP_URL = 'http://vite-app:5173'
 const RTSP_URL = 'rtsp://mediamtx:8554/weather'
-const FRAMERATE = 10
+const FRAMERATE = 1
+const INTERVAL = 5000
 
 async function main() {
   const browser = await puppeteer.launch({
@@ -34,7 +35,7 @@ async function main() {
   // oxfmt-ignore
   const ffmpeg = spawn('ffmpeg', [
     '-f', 'image2pipe',
-    '-vcodec', 'png',
+    '-vcodec', 'mjpeg',
     '-r', FRAMERATE.toString(),
     '-i', '-',
     '-c:v', 'libx264',
@@ -46,36 +47,19 @@ async function main() {
     RTSP_URL
   ]);
 
-  let stderrBuffer = ''
-  ffmpeg.stderr.on('data', (data) => {
-    const msg = data.toString()
-    stderrBuffer += msg
-    console.log(`[FFmpeg] ${msg.trim()}`)
-  })
-
   ffmpeg.stderr.on('data', (data) => {
     console.log(`[FFMPEG] ${data.toString()}`)
   })
 
-  while (true) {
+  setInterval(async () => {
     try {
-      const startTime = Date.now()
-
       // Capture screenshot as a raw buffer and write to FFMPEG stdin
-      const screenshotBuffer = await page.screenshot({ type: 'png' })
+      const screenshotBuffer = await page.screenshot({ type: 'jpeg', quality: 80 })
       ffmpeg.stdin.write(screenshotBuffer)
-
-      // Dynamically calculate sleep time to maintain target framerate
-      const elapsed = Date.now() - startTime
-      const sleepTime = Math.max(0, 1000 / FRAMERATE - elapsed)
-      await new Promise((resolve) => setTimeout(resolve, sleepTime))
     } catch (err) {
       console.error('Error during frame capture:', err)
-      break
     }
-  }
-
-  await browser.close()
+  }, INTERVAL)
 }
 
 main().catch(console.error)
