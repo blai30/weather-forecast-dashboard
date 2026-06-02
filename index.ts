@@ -4,7 +4,7 @@ import puppeteer from 'puppeteer'
 
 const APP_URL = 'http://vite-app:5173'
 const RTSP_URL = 'rtsp://mediamtx:8554/weather'
-const FRAMERATE = 1
+const FRAMERATE = 10
 
 async function main() {
   const browser = await puppeteer.launch({
