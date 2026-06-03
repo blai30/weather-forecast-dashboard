@@ -1,9 +1,11 @@
+import 'dotenv/config'
 import { spawn } from 'child_process'
 
 import puppeteer from 'puppeteer'
 
-const APP_URL = 'http://vite-app:5173'
-const RTSP_URL = 'rtsp://mediamtx:554/weather'
+const DEV_MODE = process.env.NODE_ENV === 'development'
+const APP_URL = DEV_MODE ? 'http://localhost:5173' : 'http://vite-app:5173'
+const RTSP_URL = DEV_MODE ? 'rtsp://localhost:554/weather' : 'rtsp://mediamtx:554/weather'
 const FRAMERATE = 5
 const INTERVAL = 600_000
 
