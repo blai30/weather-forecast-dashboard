@@ -18,13 +18,17 @@ export function createWsDiscovery(device: OnvifDevice) {
       console.log(`[WS-Discovery] Listening on port ${DISCOVERY_PORT}`)
     })
 
-    socket.on('message', (message: Buffer) => {
+    socket.on('message', (message: Buffer, remoteInfo: dgram.RemoteInfo) => {
       const text = message.toString()
-      if (!text.includes('Probe') || !text.includes('NetworkVideoTransmitter')) return
+      // Respond to Probe requests only, not to ProbeMatches replies from other devices.
+      if (!text.includes('Probe') || text.includes('ProbeMatches')) return
       const probeMessageId = extractMessageId(text)
       if (!probeMessageId) return
       try {
-        socket.send(device.probeMatchXml(probeMessageId), DISCOVERY_PORT, MULTICAST_GROUP)
+        // WS-Discovery replies are unicast back to the sender's source address and
+        // port, not to the multicast group. The probing client listens for the
+        // ProbeMatch on the ephemeral port it sent from.
+        socket.send(device.probeMatchXml(probeMessageId), remoteInfo.port, remoteInfo.address)
       } catch {
         /* silent on send failure */
       }
@@ -43,6 +47,8 @@ export function createWsDiscovery(device: OnvifDevice) {
 }
 
 function extractMessageId(xml: string): string | null {
-  const match = xml.match(/<wsa:MessageID[^>]*>([^<]+)<\/wsa:MessageID>/)
-  return match ? match[1] : null
+  // Match MessageID regardless of namespace prefix (wsa:, a:, w:, or none),
+  // since ONVIF clients differ in which WS-Addressing prefix they use.
+  const match = xml.match(/<(?:\w+:)?MessageID[^>]*>([^<]+)<\/(?:\w+:)?MessageID>/)
+  return match ? match[1].trim() : null
 }
