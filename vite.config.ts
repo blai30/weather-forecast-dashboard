@@ -6,6 +6,9 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    port: parseInt(process.env.APP_PORT ?? '5173', 10),
+  },
   plugins: [preact(), tailwindcss()],
   resolve: {
     alias: {

@@ -3,8 +3,6 @@ import path from 'path'
 
 import sirv from 'sirv'
 
-const DEFAULT_PORT = 8080
-
 // The dashboard SPA is a static build (dist/). It is loaded internally by the Puppeteer capturer and
 // can also be opened by other LAN clients, so the server binds all interfaces rather than loopback.
 const BIND_ADDRESS = '0.0.0.0'
@@ -15,7 +13,7 @@ export type FrontendServerOptions = {
 }
 
 export function createFrontendServer(options?: FrontendServerOptions) {
-  const port = options?.port ?? parseInt(process.env.APP_PORT ?? String(DEFAULT_PORT), 10)
+  const port = options?.port ?? parseInt(process.env.APP_PORT ?? '5173', 10)
   const root = path.resolve(
     options?.root ?? process.env.STATIC_ROOT ?? path.resolve(process.cwd(), 'dist')
   )
