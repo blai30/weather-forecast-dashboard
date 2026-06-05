@@ -9,8 +9,10 @@ export type Palette = Record<`--${string}`, string>
 // reliable on the streamed feed; only the background gradient and accent change.
 const SHARED = {
   '--text': '#f8fafc',
-  '--text-muted': 'rgba(241, 245, 249, 0.74)',
-  '--surface': 'rgba(255, 255, 255, 0.06)',
+  '--text-muted': 'rgba(241, 245, 249, 0.86)',
+  // Dark smoked-glass surface (flat, borderless) so the cards/tiles back their
+  // text with enough contrast even over bright condition backdrops.
+  '--surface': 'rgba(2, 6, 23, 0.3)',
 }
 
 function makePalette(backgroundFrom: string, backgroundTo: string, accent: string): Palette {

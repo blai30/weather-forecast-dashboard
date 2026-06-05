@@ -1,3 +1,4 @@
+import { ConditionBackdrop } from '@/components/condition-backdrop'
 import { CurrentConditions } from '@/components/current-conditions'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { ForecastPanel } from '@/components/forecast-panel'
@@ -22,18 +23,22 @@ export function Dashboard() {
 
   return (
     <div
-      class="grid h-full w-full grid-rows-[auto_1fr] gap-8 bg-linear-to-b from-(--background-from) to-(--background-to) p-12"
+      class="relative h-full w-full overflow-hidden bg-linear-to-b from-(--background-from) to-(--background-to)"
       style={palette}
     >
-      <DashboardHeader locationName={data.locationName} updatedAt={updatedAt} />
+      <ConditionBackdrop group={group} isDay={data.current.isDay} />
 
-      <div class="grid min-h-0 grid-cols-[1.1fr_1fr] gap-10">
-        <CurrentConditions
-          current={data.current}
-          daily={data.daily}
-          temperatureUnit={data.temperatureUnit}
-        />
-        <ForecastPanel hourly={data.hourly} />
+      <div class="relative grid h-full w-full grid-rows-[auto_1fr] gap-8 p-12">
+        <DashboardHeader locationName={data.locationName} updatedAt={updatedAt} />
+
+        <div class="grid min-h-0 grid-cols-[1.1fr_1fr] gap-10">
+          <CurrentConditions
+            current={data.current}
+            daily={data.daily}
+            temperatureUnit={data.temperatureUnit}
+          />
+          <ForecastPanel hourly={data.hourly} />
+        </div>
       </div>
     </div>
   )
