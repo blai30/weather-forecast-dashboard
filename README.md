@@ -1,6 +1,9 @@
-# weather-dash
+# forecast-onvif
 
-A live weather dashboard
+A virtual ONVIF camera that streams a live weather dashboard to your NVR. It renders a Preact
+dashboard in headless Chromium, screenshots it on an interval, and encodes those frames into an
+H.264 RTSP stream fronted by an ONVIF SOAP server with WS-Discovery, so an NVR such as Unifi
+Protect auto-discovers it and shows the current forecast as if it were a real camera.
 
 ## Development
 
@@ -44,7 +47,7 @@ sudo usermod -aG docker $USER   # then log out / back in
 **2. Get the code and configure `.env`:**
 
 ```bash
-git clone <repo-url> weather-dash && cd weather-dash
+git clone <repo-url> forecast-onvif && cd forecast-onvif
 cp .env.example .env
 ```
 

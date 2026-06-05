@@ -1,4 +1,4 @@
-# weather-dash is an ONVIF "weather camera": a tsx-run Node process that renders the Preact
+# forecast-onvif is an ONVIF "weather camera": a tsx-run Node process that renders the Preact
 # dashboard in headless Chromium, encodes screenshots to H.264 via ffmpeg, and serves them over
 # RTSP + ONVIF. Built for linux/arm64 (Raspberry Pi 5); build natively on the Pi.
 
