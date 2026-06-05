@@ -1,91 +1,67 @@
-import { findCurrentHourIndex } from '@/lib/forecast'
-import type {
-  WeatherData,
-  CurrentWeather,
-  HourlyEntry,
-  DailyEntry,
-  LocationConfig,
-} from '@/lib/weather-types'
+import type { HourlyForecast, OpenMeteoResponse, WeatherData } from '@/lib/weather-types'
 
-async function fetchConfig(): Promise<LocationConfig> {
-  return {
-    latitude: import.meta.env.VITE_WEATHER_LAT || 40.7128,
-    longitude: import.meta.env.VITE_WEATHER_LON || -74.006,
-    name: import.meta.env.VITE_WEATHER_NAME || 'New York',
-  }
+const FORECAST_ENDPOINT = 'https://api.open-meteo.com/v1/forecast'
+const FORECAST_HOURS = 5
+
+function buildRequestUrl(): string {
+  const parameters = new URLSearchParams({
+    latitude: import.meta.env.VITE_WEATHER_LAT ?? '40.7128',
+    longitude: import.meta.env.VITE_WEATHER_LON ?? '-74.0060',
+    current: 'temperature_2m,apparent_temperature,weather_code,is_day,precipitation',
+    hourly: 'temperature_2m,weather_code,precipitation_probability',
+    daily: 'temperature_2m_max,temperature_2m_min',
+    temperature_unit: 'fahrenheit',
+    precipitation_unit: 'inch',
+    timezone: 'auto',
+    forecast_days: '2',
+  })
+  return `${FORECAST_ENDPOINT}?${parameters.toString()}`
 }
 
-async function fetchFromOpenMeteo(location: LocationConfig): Promise<WeatherData> {
-  const { latitude, longitude, name } = location
+// The hourly arrays start at midnight of the current local day. Find the entry
+// matching the current hour so we can slice the hours that follow it.
+function findCurrentHourIndex(times: string[], currentTime: string): number {
+  const currentHourPrefix = currentTime.slice(0, 13)
+  const index = times.findIndex((time) => time.slice(0, 13) === currentHourPrefix)
+  return index === -1 ? 0 : index
+}
 
-  const url = new URL('https://api.open-meteo.com/v1/forecast')
-  url.searchParams.set('latitude', String(latitude))
-  url.searchParams.set('longitude', String(longitude))
-  url.searchParams.set(
-    'current',
-    'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,uv_index'
-  )
-  url.searchParams.set('hourly', 'temperature_2m,weather_code,precipitation_probability')
-  url.searchParams.set(
-    'daily',
-    'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset'
-  )
-  url.searchParams.set('timezone', 'auto')
-  url.searchParams.set('forecast_days', '7')
-  url.searchParams.set('temperature_unit', 'fahrenheit')
-
-  const res = await fetch(url.toString())
-  if (!res.ok) {
-    throw new Error(`Open-Meteo API error: ${res.status}`)
+function normalize(raw: OpenMeteoResponse): WeatherData {
+  const startIndex = findCurrentHourIndex(raw.hourly.time, raw.current.time) + 1
+  const hourly: HourlyForecast[] = []
+  for (let offset = 0; offset < FORECAST_HOURS; offset++) {
+    const index = startIndex + offset
+    hourly.push({
+      time: raw.hourly.time[index],
+      temperature: raw.hourly.temperature_2m[index],
+      weatherCode: raw.hourly.weather_code[index],
+      precipitationProbability: raw.hourly.precipitation_probability[index],
+    })
   }
-
-  const json = await res.json()
-
-  const current: CurrentWeather = {
-    temperature: json.current.temperature_2m,
-    apparentTemperature: json.current.apparent_temperature,
-    weatherCode: json.current.weather_code,
-    humidity: json.current.relative_humidity_2m,
-    windSpeed: json.current.wind_speed_10m,
-    windDirection: json.current.wind_direction_10m,
-    pressure: json.current.surface_pressure,
-    uvIndex: json.current.uv_index,
-    precipitationProbability: 0,
-  }
-
-  const hourly: HourlyEntry[] = json.hourly.time.map((time: string, i: number) => ({
-    time,
-    temperature: json.hourly.temperature_2m[i],
-    weatherCode: json.hourly.weather_code[i],
-    precipitationProbability: json.hourly.precipitation_probability[i] ?? 0,
-  }))
-
-  // Derive current precipitation probability from the current hour. Open-Meteo
-  // returns times in the location's local timezone (json.timezone, via
-  // timezone=auto), so the current hour must be matched in that same zone.
-  const currentHourIndex = findCurrentHourIndex(hourly, json.timezone)
-  current.precipitationProbability = hourly[currentHourIndex]?.precipitationProbability ?? 0
-
-  const daily: DailyEntry[] = json.daily.time.map((date: string, i: number) => ({
-    date,
-    temperatureMax: json.daily.temperature_2m_max[i],
-    temperatureMin: json.daily.temperature_2m_min[i],
-    weatherCode: json.daily.weather_code[i],
-    precipitationProbabilityMax: json.daily.precipitation_probability_max[i] ?? 0,
-    sunrise: json.daily.sunrise[i],
-    sunset: json.daily.sunset[i],
-  }))
 
   return {
-    current,
+    locationName: import.meta.env.VITE_WEATHER_NAME ?? 'Unknown location',
+    temperatureUnit: '°F',
+    current: {
+      temperature: raw.current.temperature_2m,
+      apparentTemperature: raw.current.apparent_temperature,
+      weatherCode: raw.current.weather_code,
+      isDay: raw.current.is_day === 1,
+      precipitation: raw.current.precipitation,
+    },
     hourly,
-    daily,
-    locationName: name,
-    updatedAt: new Date(),
+    daily: {
+      temperatureMax: raw.daily.temperature_2m_max[0],
+      temperatureMin: raw.daily.temperature_2m_min[0],
+    },
   }
 }
 
-export async function getWeatherData(): Promise<WeatherData> {
-  const location = await fetchConfig()
-  return fetchFromOpenMeteo(location)
+export async function fetchWeather(): Promise<WeatherData> {
+  const response = await fetch(buildRequestUrl())
+  if (!response.ok) {
+    throw new Error(`Open-Meteo request failed with status ${response.status}`)
+  }
+  const raw = (await response.json()) as OpenMeteoResponse
+  return normalize(raw)
 }

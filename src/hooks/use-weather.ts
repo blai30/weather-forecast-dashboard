@@ -1,42 +1,55 @@
 import { useEffect, useState } from 'preact/hooks'
 
-import { getWeatherData } from '@/lib/weather-api'
+import { fetchWeather } from '@/lib/weather-api'
 import type { WeatherData } from '@/lib/weather-types'
 
-const POLL_INTERVAL_MS = 10 * 60 * 1000 // 10 minutes
+// The page is loaded once by the headless capturer and then screenshotted every
+// 10 minutes without reloading, so the SPA must refresh its own data on this
+// interval. Without it every frame after the first would be identical.
+const REFRESH_INTERVAL_MS = 10 * 60 * 1000
 
-export function useWeather() {
-  const [data, setData] = useState<WeatherData | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+export type WeatherStatus = 'loading' | 'ready' | 'error'
+
+export type WeatherState = {
+  data: WeatherData | null
+  status: WeatherStatus
+  updatedAt: Date | null
+}
+
+export function useWeather(): WeatherState {
+  const [state, setState] = useState<WeatherState>({
+    data: null,
+    status: 'loading',
+    updatedAt: null,
+  })
 
   useEffect(() => {
     let cancelled = false
 
-    async function fetchWeather() {
+    async function load() {
       try {
-        const result = await getWeatherData()
-        if (!cancelled) {
-          setData(result)
-          setError(null)
-          setLoading(false)
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to fetch weather')
-          setLoading(false)
-        }
+        const data = await fetchWeather()
+        if (cancelled) return
+        setState({ data, status: 'ready', updatedAt: new Date() })
+      } catch {
+        if (cancelled) return
+        // Keep showing the last good frame on a refresh failure; only surface an
+        // error when nothing has loaded yet.
+        setState((previous) => ({
+          data: previous.data,
+          status: previous.data ? 'ready' : 'error',
+          updatedAt: previous.updatedAt,
+        }))
       }
     }
 
-    fetchWeather()
-    const interval = setInterval(fetchWeather, POLL_INTERVAL_MS)
-
+    load()
+    const intervalId = setInterval(load, REFRESH_INTERVAL_MS)
     return () => {
       cancelled = true
-      clearInterval(interval)
+      clearInterval(intervalId)
     }
   }, [])
 
-  return { data, error, loading }
+  return state
 }
