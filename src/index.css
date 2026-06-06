@@ -14,12 +14,12 @@
   /* Shared, condition-independent tokens. Text/surface stay constant so contrast
      is reliable on the streamed feed; only the gradient + accent change. */
   :root {
-    --text: #f8fafc;
-    --text-muted: rgba(241, 245, 249, 0.86);
+    --text: var(--color-slate-50);
+    --text-muted: color-mix(in oklab, var(--color-slate-100) 86%, transparent);
     /* Dark smoked-glass surface (flat, borderless) so cards/tiles back their
        text with enough contrast even over bright condition backdrops. Lighter
        tint paired with backdrop-blur on the consuming widgets for a frosted look. */
-    --surface: rgba(2, 6, 23, 0.22);
+    --surface: color-mix(in oklab, var(--color-slate-950) 22%, transparent);
   }
 }
 
@@ -27,75 +27,75 @@
    (theme-<group>-<day|night>); descendants read the vars via utilities such as
    `text-(--text)` or gradient stops `from-(--background-from)`. */
 .theme-clear-day {
-  --background-from: #0ea5e9;
-  --background-to: #0369a1;
-  --accent: #fbbf24;
+  --background-from: var(--color-sky-500);
+  --background-to: var(--color-sky-700);
+  --accent: var(--color-amber-300);
 }
 
 .theme-clear-night {
-  --background-from: #1e1b4b;
-  --background-to: #0b1120;
-  --accent: #c7d2fe;
+  --background-from: var(--color-indigo-950);
+  --background-to: var(--color-slate-950);
+  --accent: var(--color-indigo-300);
 }
 
 .theme-cloudy-day {
-  --background-from: #64748b;
-  --background-to: #334155;
-  --accent: #e2e8f0;
+  --background-from: var(--color-mist-500);
+  --background-to: var(--color-mist-700);
+  --accent: var(--color-mist-300);
 }
 
 .theme-cloudy-night {
-  --background-from: #334155;
-  --background-to: #0f172a;
-  --accent: #cbd5e1;
+  --background-from: var(--color-mist-700);
+  --background-to: var(--color-mist-900);
+  --accent: var(--color-mist-300);
 }
 
 .theme-fog-day {
-  --background-from: #94a3b8;
-  --background-to: #64748b;
-  --accent: #f1f5f9;
+  --background-from: var(--color-slate-400);
+  --background-to: var(--color-slate-500);
+  --accent: var(--color-slate-300);
 }
 
 .theme-fog-night {
-  --background-from: #475569;
-  --background-to: #1e293b;
-  --accent: #e2e8f0;
+  --background-from: var(--color-slate-600);
+  --background-to: var(--color-slate-800);
+  --accent: var(--color-slate-300);
 }
 
 .theme-rain-day {
-  --background-from: #1d4ed8;
-  --background-to: #1e3a8a;
-  --accent: #7dd3fc;
+  --background-from: var(--color-blue-900);
+  --background-to: var(--color-blue-950);
+  --accent: var(--color-sky-300);
 }
 
 .theme-rain-night {
-  --background-from: #172554;
-  --background-to: #0b1120;
-  --accent: #60a5fa;
+  --background-from: var(--color-blue-950);
+  --background-to: var(--color-slate-950);
+  --accent: var(--color-blue-300);
 }
 
 .theme-snow-day {
-  --background-from: #7dd3fc;
-  --background-to: #3b82f6;
-  --accent: #f0f9ff;
+  --background-from: var(--color-sky-300);
+  --background-to: var(--color-blue-500);
+  --accent: var(--color-sky-200);
 }
 
 .theme-snow-night {
-  --background-from: #334155;
-  --background-to: #0f172a;
-  --accent: #e0f2fe;
+  --background-from: var(--color-slate-700);
+  --background-to: var(--color-slate-900);
+  --accent: var(--color-sky-200);
 }
 
 .theme-thunder-day {
-  --background-from: #5b21b6;
-  --background-to: #312e81;
-  --accent: #fde047;
+  --background-from: var(--color-indigo-950);
+  --background-to: var(--color-indigo-950);
+  --accent: var(--color-indigo-300);
 }
 
 .theme-thunder-night {
-  --background-from: #2e1065;
-  --background-to: #0b1120;
-  --accent: #fde047;
+  --background-from: var(--color-indigo-950);
+  --background-to: var(--color-slate-950);
+  --accent: var(--color-indigo-300);
 }
 
 /* Scrim over the condition backdrop: a palette tint that blends the texture
@@ -104,7 +104,7 @@
 @utility condition-scrim {
   background:
     linear-gradient(135deg,
-      color-mix(in oklab, var(--background-from) 70%, transparent),
-      color-mix(in oklab, var(--background-to) 58%, transparent)),
+      color-mix(in oklab, var(--background-from) 60%, transparent),
+      color-mix(in oklab, var(--background-to) 48%, transparent)),
     linear-gradient(rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.24));
 }
