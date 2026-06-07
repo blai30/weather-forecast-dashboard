@@ -12,6 +12,8 @@ import {
   Sun,
 } from 'lucide-preact'
 
+type LucideIcon = typeof Sun
+
 type WeatherIconProperties = {
   code: number
   isDay: boolean
@@ -19,52 +21,53 @@ type WeatherIconProperties = {
   strokeWidth?: number
 }
 
+// WMO codes whose icon differs between day and night.
+const dayNightIconsByCode: Readonly<Record<number, { day: LucideIcon; night: LucideIcon }>> = {
+  0: { day: Sun, night: Moon }, // clear sky
+  1: { day: Sun, night: Moon }, // mainly clear
+  2: { day: CloudSun, night: CloudMoon }, // partly cloudy
+}
+
+// WMO codes with a single icon regardless of time of day.
+const iconsByCode: Readonly<Record<number, LucideIcon>> = {
+  3: Cloudy, // overcast
+  45: CloudFog, // fog
+  48: CloudFog, // depositing rime fog
+  51: CloudDrizzle, // drizzle: light
+  53: CloudDrizzle, // drizzle: moderate
+  55: CloudDrizzle, // drizzle: dense
+  56: CloudDrizzle, // freezing drizzle: light
+  57: CloudDrizzle, // freezing drizzle: dense
+  61: CloudRain, // rain: slight
+  63: CloudRain, // rain: moderate
+  65: CloudRain, // rain: heavy
+  66: CloudRain, // freezing rain: light
+  67: CloudRain, // freezing rain: heavy
+  80: CloudRain, // rain showers: slight
+  81: CloudRain, // rain showers: moderate
+  82: CloudRain, // rain showers: violent
+  71: CloudSnow, // snow fall: slight
+  73: CloudSnow, // snow fall: moderate
+  75: CloudSnow, // snow fall: heavy
+  77: CloudSnow, // snow grains
+  85: CloudSnow, // snow showers: slight
+  86: CloudSnow, // snow showers: heavy
+  95: CloudLightning, // thunderstorm: slight or moderate
+  96: CloudLightning, // thunderstorm with slight hail
+  99: CloudLightning, // thunderstorm with heavy hail
+}
+
 // Map a WMO weather code to a lucide icon, choosing day/night variants where
 // they exist.
-function pickIcon(code: number, isDay: boolean): typeof Sun {
-  switch (code) {
-    case 0:
-    case 1:
-      return isDay ? Sun : Moon
-    case 2:
-      return isDay ? CloudSun : CloudMoon
-    case 3:
-      return Cloudy
-    case 45:
-    case 48:
-      return CloudFog
-    case 51:
-    case 53:
-    case 55:
-    case 56:
-    case 57:
-      return CloudDrizzle
-    case 61:
-    case 63:
-    case 65:
-    case 66:
-    case 67:
-    case 80:
-    case 81:
-    case 82:
-      return CloudRain
-    case 71:
-    case 73:
-    case 75:
-    case 77:
-    case 85:
-    case 86:
-      return CloudSnow
-    case 95:
-    case 96:
-    case 99:
-      return CloudLightning
-    default:
-      return Cloud
+export function getWeatherIcon(code: number, isDay: boolean): LucideIcon {
+  const dayNightIcon = dayNightIconsByCode[code]
+  if (dayNightIcon) {
+    return isDay ? dayNightIcon.day : dayNightIcon.night
   }
+  return iconsByCode[code] ?? Cloud
 }
 
 export function WeatherIcon({ code, isDay, size, strokeWidth = 1.5 }: WeatherIconProperties) {
-  const Icon = pickIcon(code, isDay)
+  const Icon = getWeatherIcon(code, isDay)
   return <Icon size={size} strokeWidth={strokeWidth} />
 }
