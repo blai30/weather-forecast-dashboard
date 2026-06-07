@@ -10,7 +10,6 @@
 }
 
 @layer base {
-
   /* Shared, condition-independent tokens. Text/surface stay constant so contrast
      is reliable on the streamed feed; only the gradient + accent change. */
   :root {
@@ -103,8 +102,10 @@
    contrast floor on bright textures (snow, clear day, fog). */
 @utility condition-scrim {
   background:
-    linear-gradient(135deg,
+    linear-gradient(
+      135deg,
       color-mix(in oklab, var(--background-from) 60%, transparent),
-      color-mix(in oklab, var(--background-to) 48%, transparent)),
+      color-mix(in oklab, var(--background-to) 48%, transparent)
+    ),
     linear-gradient(rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.24));
 }
