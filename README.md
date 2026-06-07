@@ -1,4 +1,4 @@
-# forecast-onvif
+# weather-forecast-dashboard
 
 A weather dashboard built with Preact, Vite, and Tailwind CSS. It fetches the current conditions and forecast from [Open-Meteo](https://open-meteo.com/) and renders a condition-reactive 16:9 dashboard.
 
