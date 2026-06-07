@@ -8,7 +8,7 @@ import { Preview } from '@/dev/preview'
 // so this branch (and the `<Preview />` reference) is dead-code-eliminated.
 // The `Preview` import itself is removed by the `strip-dev-imports` plugin in
 // vite.config.ts, because Rolldown does not drop dead-branch imports on its own,
-// so the gallery and its fixtures can never reach the shipped bundle or the ONVIF feed.
+// so the gallery and its fixtures can never reach the shipped bundle.
 const showPreview = import.meta.env.DEV && window.location.pathname === '/preview'
 
 render(showPreview ? <Preview /> : <App />, document.getElementById('app')!)
