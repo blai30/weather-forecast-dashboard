@@ -23,9 +23,9 @@ function formatHour(isoTime: string): string {
 
 export function ForecastPanel({ hourly }: ForecastPanelProperties) {
   return (
-    <section class="flex h-full flex-col rounded-3xl bg-(--surface) p-8 backdrop-blur-xl">
+    <section class="flex h-full flex-col rounded-3xl bg-(--surface) px-8 pt-8 backdrop-blur-xl">
       {/* w-120 sizes both rows; the chart reads this width via ParentSize. */}
-      <div class="mx-auto flex h-full w-120 flex-col">
+      <div class="mx-auto flex h-full w-120 flex-col gap-4">
         <div class="grid grid-cols-5 gap-2">
           {hourly.map((entry) => (
             <div key={entry.time} class="flex flex-col items-center gap-2 text-(--text)">
