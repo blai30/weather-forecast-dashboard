@@ -5,7 +5,7 @@ type WeatherCodeInfo = {
   group: WeatherGroup
 }
 
-// WMO weather interpretation codes used by Open-Meteo.
+/** WMO weather interpretation codes used by Open-Meteo. */
 const WEATHER_CODES: Record<number, WeatherCodeInfo> = {
   0: { label: 'Clear sky', group: 'clear' },
   1: { label: 'Mainly clear', group: 'clear' },

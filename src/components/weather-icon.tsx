@@ -21,14 +21,14 @@ type WeatherIconProperties = {
   strokeWidth?: number
 }
 
-// WMO codes whose icon differs between day and night.
+/** WMO codes whose icon differs between day and night. */
 const dayNightIconsByCode: Readonly<Record<number, { day: LucideIcon; night: LucideIcon }>> = {
   0: { day: Sun, night: Moon }, // clear sky
   1: { day: Sun, night: Moon }, // mainly clear
   2: { day: CloudSun, night: CloudMoon }, // partly cloudy
 }
 
-// WMO codes with a single icon regardless of time of day.
+/** WMO codes with a single icon regardless of time of day. */
 const iconsByCode: Readonly<Record<number, LucideIcon>> = {
   3: Cloudy, // overcast
   45: CloudFog, // fog
@@ -57,8 +57,10 @@ const iconsByCode: Readonly<Record<number, LucideIcon>> = {
   99: CloudLightning, // thunderstorm with heavy hail
 }
 
-// Map a WMO weather code to a lucide icon, choosing day/night variants where
-// they exist.
+/**
+ * Map a WMO weather code to a lucide icon, choosing day/night variants where
+ * they exist.
+ */
 export function getWeatherIcon(code: number, isDay: boolean): LucideIcon {
   const dayNightIcon = dayNightIconsByCode[code]
   if (dayNightIcon) {

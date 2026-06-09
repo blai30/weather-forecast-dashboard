@@ -5,11 +5,13 @@ type DashboardHeaderProperties = {
   updatedAt: Date | null
 }
 
-// Empty VITE_TIMEZONE falls back to the runtime's timezone.
+/** Empty VITE_TIMEZONE falls back to the runtime's timezone. */
 const TIME_ZONE = import.meta.env.VITE_TIMEZONE || undefined
 
-// `updatedAt` is a real instant (Date.now of the last fetch), so converting it
-// to the configured timezone with Intl is correct.
+/**
+ * `updatedAt` is a real instant (Date.now of the last fetch), so converting it
+ * to the configured timezone with Intl is correct.
+ */
 function formatUpdatedTime(updatedAt: Date): string {
   return new Intl.DateTimeFormat(undefined, {
     weekday: 'short',

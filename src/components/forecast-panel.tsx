@@ -8,8 +8,10 @@ type ForecastPanelProperties = {
   hourly: HourlyForecast[]
 }
 
-// Open-Meteo returns location-local times with no offset,
-// so the hour is read straight from the string, no timezone conversion needed.
+/**
+ * Open-Meteo returns location-local times with no offset,
+ * so the hour is read straight from the string, no timezone conversion needed.
+ */
 function readHour(isoTime: string): number {
   return Number(isoTime.slice(11, 13))
 }
@@ -31,11 +33,7 @@ export function ForecastPanel({ hourly }: ForecastPanelProperties) {
             <div key={entry.time} class="flex flex-col items-center gap-2 text-(--text)">
               <span class="text-2xl font-medium text-(--text-muted)">{formatHour(entry.time)}</span>
               <div class="text-(--accent)">
-                <WeatherIcon
-                  code={entry.weatherCode}
-                  isDay={readHour(entry.time) >= 6 && readHour(entry.time) < 19}
-                  size={54}
-                />
+                <WeatherIcon code={entry.weatherCode} isDay={entry.isDay} size={54} />
               </div>
               <span class="text-4xl font-bold">{Math.round(entry.temperature)}°</span>
               <span class="inline-flex items-center gap-1.5 text-xl text-(--text-muted)">

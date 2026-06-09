@@ -3,9 +3,11 @@ import { useEffect, useState } from 'preact/hooks'
 import { fetchWeather } from '@/lib/weather-api'
 import type { WeatherData } from '@/lib/weather-types'
 
-// The page is loaded once by the headless capturer and then screenshotted every
-// 10 minutes without reloading, so the SPA must refresh its own data on this
-// interval. Without it every frame after the first would be identical.
+/**
+ * The page is loaded once by the headless capturer and then screenshotted every
+ * 10 minutes without reloading, so the SPA must refresh its own data on this
+ * interval. Without it every frame after the first would be identical.
+ */
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000
 
 export type WeatherStatus = 'loading' | 'ready' | 'error'

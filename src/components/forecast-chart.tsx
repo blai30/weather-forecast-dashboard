@@ -141,8 +141,10 @@ function ChartContent({ hourly, width, height }: ChartContentProperties) {
   )
 }
 
-// Width and height come from the surrounding layout (the Tailwind-sized
-// container) via ParentSize, so there is no pixel constant in this module.
+/**
+ * Width and height come from the surrounding layout (the Tailwind-sized
+ * container) via ParentSize, so there is no pixel constant in this module.
+ */
 export function ForecastChart({ hourly }: ForecastChartProperties) {
   return (
     <div class="min-h-0 w-full flex-1">

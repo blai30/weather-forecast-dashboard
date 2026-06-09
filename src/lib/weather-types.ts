@@ -1,7 +1,7 @@
-// Weather condition buckets used to drive the condition-reactive palette.
+/** Weather condition buckets used to drive the condition-reactive palette. */
 export type WeatherGroup = 'clear' | 'cloudy' | 'fog' | 'rain' | 'snow' | 'thunder'
 
-// Shape of the raw Open-Meteo Forecast API response (only the fields we request).
+/** Shape of the raw Open-Meteo Forecast API response (only the fields we request). */
 export type OpenMeteoResponse = {
   current: {
     time: string
@@ -16,6 +16,7 @@ export type OpenMeteoResponse = {
     temperature_2m: number[]
     weather_code: number[]
     precipitation_probability: number[]
+    is_day: number[]
   }
   daily: {
     temperature_2m_max: number[]
@@ -32,11 +33,12 @@ export type CurrentWeather = {
 }
 
 export type HourlyForecast = {
-  // Location-local ISO time, e.g. "2026-06-05T15:00" (no offset, timezone=auto).
+  /** Location-local ISO time, e.g. "2026-06-05T15:00" (no offset, timezone=auto). */
   time: string
   temperature: number
   weatherCode: number
   precipitationProbability: number
+  isDay: boolean
 }
 
 export type DailyExtremes = {
@@ -44,7 +46,7 @@ export type DailyExtremes = {
   temperatureMin: number
 }
 
-// Normalized data the UI consumes.
+/** Normalized data the UI consumes. */
 export type WeatherData = {
   locationName: string
   temperatureUnit: string

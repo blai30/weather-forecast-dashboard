@@ -7,10 +7,12 @@ type ConditionBackdropProperties = {
   isDay: boolean
 }
 
-// Full-bleed condition texture served from public/backdrops/<key>.webp.
-// It is a CSS background (not an <img>) so a missing file renders nothing.
-// The root gradient shows through the scrim, rather than a broken-image icon.
-// The class strings are written out in full so Tailwind's JIT generates each url() rule.
+/**
+ * Full-bleed condition texture served from public/backdrops/<key>.webp.
+ * It is a CSS background (not an <img>) so a missing file renders nothing.
+ * The root gradient shows through the scrim, rather than a broken-image icon.
+ * The class strings are written out in full so Tailwind's JIT generates each url() rule.
+ */
 const BACKDROP_IMAGE_CLASS: Record<string, string> = {
   'clear-day': 'bg-[url(/backdrops/clear-day.webp)]',
   'clear-night': 'bg-[url(/backdrops/clear-night.webp)]',

@@ -1,11 +1,13 @@
 import type { HourlyForecast, WeatherData, WeatherGroup } from '@/lib/weather-types'
 
-// Open-Meteo returns location-local ISO strings with no offset, and the UI reads
-// the hour straight from characters 11-13, so any valid "YYYY-MM-DDTHH:00" works.
-// A fixed base hour keeps preview frames deterministic.
+/**
+ * Open-Meteo returns location-local ISO strings with no offset, and the UI reads
+ * the hour straight from characters 11-13, so any valid "YYYY-MM-DDTHH:00" works.
+ * A fixed base hour keeps preview frames deterministic.
+ */
 const BASE_HOUR = 13
 
-function buildHourly(weatherCode: number): HourlyForecast[] {
+function buildHourly(weatherCode: number, isDay: boolean): HourlyForecast[] {
   const hourly: HourlyForecast[] = []
   for (let offset = 0; offset < 5; offset++) {
     const hour = String(BASE_HOUR + offset).padStart(2, '0')
@@ -14,13 +16,16 @@ function buildHourly(weatherCode: number): HourlyForecast[] {
       temperature: 70 + offset,
       weatherCode,
       precipitationProbability: 20 + offset * 10,
+      isDay,
     })
   }
   return hourly
 }
 
-// Builds a complete, plausible WeatherData for a given condition so every preview
-// cell renders a believable full frame, not just a coloured background.
+/**
+ * Builds a complete, plausible WeatherData for a given condition so every preview
+ * cell renders a believable full frame, not just a coloured background.
+ */
 export function makeWeatherData(
   weatherCode: number,
   isDay: boolean,
@@ -36,7 +41,7 @@ export function makeWeatherData(
       isDay,
       precipitation: 0.12,
     },
-    hourly: buildHourly(weatherCode),
+    hourly: buildHourly(weatherCode, isDay),
     daily: {
       temperatureMax: 78,
       temperatureMin: 61,
@@ -51,8 +56,10 @@ export type PreviewScenario = {
   weatherCode: number
 }
 
-// One representative WMO code per condition group (verified against weather-codes.ts:
-// 0 clear, 3 cloudy, 45 fog, 63 rain, 73 snow, 95 thunder).
+/**
+ * One representative WMO code per condition group (verified against weather-codes.ts:
+ * 0 clear, 3 cloudy, 45 fog, 63 rain, 73 snow, 95 thunder).
+ */
 export const SCENARIOS: PreviewScenario[] = [
   { group: 'clear', label: 'Clear', weatherCode: 0 },
   { group: 'cloudy', label: 'Cloudy', weatherCode: 3 },

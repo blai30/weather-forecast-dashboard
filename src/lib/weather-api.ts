@@ -8,7 +8,7 @@ function buildRequestUrl(): string {
     latitude: import.meta.env.VITE_WEATHER_LAT ?? '40.7128',
     longitude: import.meta.env.VITE_WEATHER_LON ?? '-74.0060',
     current: 'temperature_2m,apparent_temperature,weather_code,is_day,precipitation',
-    hourly: 'temperature_2m,weather_code,precipitation_probability',
+    hourly: 'temperature_2m,weather_code,precipitation_probability,is_day',
     daily: 'temperature_2m_max,temperature_2m_min',
     temperature_unit: 'fahrenheit',
     precipitation_unit: 'inch',
@@ -18,15 +18,22 @@ function buildRequestUrl(): string {
   return `${FORECAST_ENDPOINT}?${parameters.toString()}`
 }
 
-// The hourly arrays start at midnight of the current local day. Find the entry
-// matching the current hour so we can slice the hours that follow it.
+/**
+ * The hourly arrays start at midnight of the current local day. Find the entry
+ * matching the current hour so we can slice the hours that follow it.
+ */
 function findCurrentHourIndex(times: string[], currentTime: string): number {
   const currentHourPrefix = currentTime.slice(0, 13)
   const index = times.findIndex((time) => time.slice(0, 13) === currentHourPrefix)
   return index === -1 ? 0 : index
 }
 
-function normalize(raw: OpenMeteoResponse): WeatherData {
+/**
+ * Pure transform from the raw Open-Meteo response to the normalized shape the UI
+ * consumes. Exported so the hour-alignment logic can be exercised directly rather
+ * than through the network.
+ */
+export function normalizeForecast(raw: OpenMeteoResponse): WeatherData {
   const startIndex = findCurrentHourIndex(raw.hourly.time, raw.current.time) + 1
   const hourly: HourlyForecast[] = []
   for (let offset = 0; offset < FORECAST_HOURS; offset++) {
@@ -36,6 +43,7 @@ function normalize(raw: OpenMeteoResponse): WeatherData {
       temperature: raw.hourly.temperature_2m[index],
       weatherCode: raw.hourly.weather_code[index],
       precipitationProbability: raw.hourly.precipitation_probability[index],
+      isDay: raw.hourly.is_day[index] === 1,
     })
   }
 
@@ -63,5 +71,5 @@ export async function fetchWeather(): Promise<WeatherData> {
     throw new Error(`Open-Meteo request failed with status ${response.status}`)
   }
   const raw = (await response.json()) as OpenMeteoResponse
-  return normalize(raw)
+  return normalizeForecast(raw)
 }
