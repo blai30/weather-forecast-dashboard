@@ -34,7 +34,7 @@ function ChartContent({ hourly, width, height }: ChartContentProperties) {
   const temperatures = hourly.map((entry) => entry.temperature)
   const minimumTemperature = Math.min(...temperatures)
   const maximumTemperature = Math.max(...temperatures)
-  const temperatureSpan = maximumTemperature - minimumTemperature || 1
+  const temperatureSpan = Math.max(maximumTemperature - minimumTemperature, 8)
 
   const horizontalScale = scalePoint<number>({
     domain: hourly.map((_, index) => index),
